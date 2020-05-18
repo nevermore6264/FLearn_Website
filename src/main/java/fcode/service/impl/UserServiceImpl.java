@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getListUser() {
         LOGGER.info("getListUser");
-        return (List<User>) this.userRepository.findAll();
+        return this.userRepository.findAll();
     }
 
     @Override
@@ -55,8 +55,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(String displayNameOrEmailAddress, String password) {
-        User displayNameExists = userRepository.findByDisplayName(displayNameOrEmailAddress);
-        User emailAddressExists = userRepository.findByEmailAddress(password);
+        User displayNameExists = findByDisplayName(displayNameOrEmailAddress);
+        User emailAddressExists = findByEmailAddress(password);
 
         if (displayNameExists == null && emailAddressExists == null) {
             LOGGER.info("Not found User");
@@ -68,6 +68,18 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         return displayNameExists;
+    }
+
+    @Override
+    public User findByDisplayName(String displayName) {
+        User displayNameExists = userRepository.findByDisplayName(displayName);
+        return displayNameExists != null ? displayNameExists : null;
+    }
+
+    @Override
+    public User findByEmailAddress(String emailAddress) {
+        User emailAddressUser = userRepository.findByEmailAddress(emailAddress);
+        return emailAddressUser != null ? emailAddressUser : null;
     }
 
 }

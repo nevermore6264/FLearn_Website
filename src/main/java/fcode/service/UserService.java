@@ -17,4 +17,8 @@ public interface UserService {
 
     User login(String displayNameOrEmailAddress, String password);
 
+    User findByDisplayName(String displayName);
+
+    User findByEmailAddress(String emailAddress);
+
 }

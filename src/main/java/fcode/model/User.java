@@ -154,6 +154,20 @@ public class User {
         this.avatar = avatar;
     }
 
+    public User(String displayName, String familyName, String emailAddress, String password, String birthYear, String phoneNumber, int provinceId, int districtId, String streetInformation, String summary, String avatar) {
+        this.displayName = displayName;
+        this.familyName = familyName;
+        this.emailAddress = emailAddress;
+        this.password = password;
+        this.birthYear = birthYear;
+        this.phoneNumber = phoneNumber;
+        this.provinceId = provinceId;
+        this.districtId = districtId;
+        this.streetInformation = streetInformation;
+        this.summary = summary;
+        this.avatar = avatar;
+    }
+
     public User() {
     }
 
