@@ -1,9 +1,9 @@
 package fcode.controller;
 
 import fcode.model.User;
-import fcode.response.Response;
 import fcode.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,42 +24,60 @@ public class UserController {
     private UserService userService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ResponseEntity<Response<List<User>>> getListUser() {
-        return ResponseEntity.ok(new Response<>(this.userService.getListUser()));
+    public ResponseEntity<List<User>> getListUser() {
+        List<User> users = this.userService.getListUser();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<Response<User>> getUserById(@PathVariable("id") String id) {
-        return ResponseEntity.ok(new Response<>(this.userService.getUserById(id)));
+    public ResponseEntity<User> getUserById(@PathVariable("id") String id) {
+        User user = this.userService.getUserById(id);
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Response<User>> createUser(@Valid @RequestBody User user, BindingResult result) {
+    public ResponseEntity<Object> createUser(@Valid @RequestBody User user, BindingResult result) {
         if (result.hasErrors()) {
             List<String> errors = new ArrayList<>();
-            result.getAllErrors().forEach(erro -> errors.add(erro.getDefaultMessage()));
-            return ResponseEntity.badRequest().body(new Response<User>(errors));
+            result.getAllErrors().forEach(e -> errors.add(e.getDefaultMessage()));
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
 
-        return ResponseEntity.ok(new Response<>(this.userService.createUser(user)));
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Response<User>> editUser(@PathVariable("id") String id, @Valid @RequestBody User user, BindingResult result) {
+    public ResponseEntity<Object> editUser(@PathVariable("id") String id, @Valid @RequestBody User user, BindingResult result) {
         if (result.hasErrors()) {
             List<String> errors = new ArrayList<>();
             result.getAllErrors().forEach(erro -> errors.add(erro.getDefaultMessage()));
-            return ResponseEntity.badRequest().body(new Response<User>(errors));
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
-
         user.setId(id);
-        return ResponseEntity.ok(new Response<>(this.userService.editUser(user)));
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Response<Integer>> deleteUser(@PathVariable("id") String id) {
-        this.userService.deleteUser(id);
-        return ResponseEntity.ok(new Response<>(1));
+    public ResponseEntity<String> deleteUser(@PathVariable("id") String id) {
+        User user = this.userService.getUserById(id);
+        if (user != null) {
+            this.userService.deleteUser(id);
+            return new ResponseEntity<>(user.getDisplayName(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public ResponseEntity<User> loginUser(@PathVariable("displayNameOrEmailAddress") String displayNameOrEmailAddress, @PathVariable("password") String password) {
+        User user = this.userService.login(displayNameOrEmailAddress, password);
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
     }
 
 }
