@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)
-    public ResponseEntity<Object> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody User user) {
         User byDisplayName = this.userService.findByDisplayName(user.getDisplayName());
         User byEmailAddress = this.userService.findByEmailAddress(user.getDisplayName());
 
@@ -52,8 +52,8 @@ public class UserController {
     }
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Object> editUser(@PathVariable("id") String id, @RequestBody User user) {
-        User getUser = this.userService.getUserById(user.getId());
+    public ResponseEntity<User> editUser(@PathVariable("id") String id, @RequestBody User user) {
+        User getUser = this.userService.getUserById(id);
         if (getUser != null) {
             this.userService.editUser(user);
             return new ResponseEntity<>(user, HttpStatus.CREATED);
